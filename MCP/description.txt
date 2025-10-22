@@ -1,0 +1,218 @@
+{
+  "name": "MCP FilesSystem",
+  "tool": "FilesSystemMCP",
+  "summary": {
+    "base_path": "Workspace",
+    "notes": [
+      "Le MCP opère sur un répertoire racine (ex : 'Workspace').",
+      "Tous les chemins sont relatifs à cette base. Le MCP protège contre les traversals (../).",
+      "Encodage lors de l'écriture/lecture : UTF-8.",
+      "Format d'appel recommandé (via wrapper ou tool) : JSON {\"action\": \"<action_name>\", \"args\": { ... }}."
+    ]
+  },
+  "functions": [
+    {
+      "id": "list_files",
+      "action": "list_files",
+      "args": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": false,
+          "description": "Répertoire relatif (ex: \"src\" ou \"\" pour la racine)."
+        }
+      ],
+      "returns": "array<string>",
+      "description": "Retourne la liste des noms de fichiers/dossiers.",
+      "examples": {
+        "json": "{\"action\":\"list_files\",\"args\":{\"path\":\"src\"}}",
+        "direct": "mcp.list_files(path=\"src\")"
+      }
+    },
+    {
+      "id": "read_file",
+      "action": "read_file",
+      "args": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Chemin relatif vers le fichier (ex: \"src/main.py\")."
+        }
+      ],
+      "returns": "string",
+      "description": "Retourne le contenu du fichier.",
+      "examples": {
+        "json": "{\"action\":\"read_file\",\"args\":{\"path\":\"src/main.py\"}}",
+        "direct": "content = mcp.read_file(\"src/main.py\")"
+      }
+    },
+    {
+      "id": "write_file",
+      "action": "write_file",
+      "args": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Chemin relatif du fichier à écrire (ex: \"src/main.py\")."
+        },
+        {
+          "name": "content",
+          "type": "string",
+          "required": true,
+          "description": "Contenu texte à écrire."
+        }
+      ],
+      "returns": "string",
+      "description": "Écrase le fichier s'il existe, crée le dossier si nécessaire. Retourne un message de succès.",
+      "examples": {
+        "json": "{\"action\":\"write_file\",\"args\":{\"path\":\"src/main.py\",\"content\":\"print('Hello World')\"}}",
+        "direct": "mcp.write_file(\"src/main.py\", \"print('Hello World')\")"
+      }
+    },
+    {
+      "id": "create_file",
+      "method": "create_file",
+      "args": [
+        {
+          "name": "relative_path",
+          "type": "string",
+          "required": true,
+          "description": "Chemin relatif ex: \"src/new_module.py\"."
+        },
+        {
+          "name": "content",
+          "type": "string",
+          "required": false,
+          "description": "Contenu initial (par défaut \"\")."
+        }
+      ],
+      "returns": "None (imprime confirmation)",
+      "description": "Crée un fichier, crée le dossier si nécessaire. Utiliser pour s'assurer que la structure est créée.",
+      "examples": {
+        "direct": "mcp.create_file(\"src/new_module.py\", \"# new module\")"
+      }
+    },
+    {
+      "id": "create_structure",
+      "method": "create_structure",
+      "args": [
+        {
+          "name": "structure",
+          "type": "object",
+          "required": true,
+          "description": "Mapping { \"path/rel.py\": \"file content\", ... }."
+        }
+      ],
+      "returns": "None",
+      "description": "Crée une arborescence de fichiers en une seule opération.",
+      "examples": {
+        "direct": "mcp.create_structure({\"src/main.py\": \"print('main')\",\"requirements.txt\": \"requests\\npyyaml\"})"
+      }
+    },
+    {
+      "id": "edit_file",
+      "method": "edit_file",
+      "args": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Chemin relatif."
+        },
+        {
+          "name": "find_text",
+          "type": "string",
+          "required": true,
+          "description": "Texte à remplacer."
+        },
+        {
+          "name": "replace_text",
+          "type": "string",
+          "required": true,
+          "description": "Texte de substitution."
+        }
+      ],
+      "returns": "string",
+      "description": "Remplace le texte dans le fichier et renvoie un message de succès.",
+      "examples": {
+        "direct": "mcp.edit_file(\"README.md\", \"OLD\", \"NEW\")"
+      }
+    },
+    {
+      "id": "scan_project",
+      "method": "scan_project",
+      "args": [],
+      "returns": "object",
+      "description": "Renvoie l'ensemble des fichiers et leur contenu sous forme de dict {relpath: content}.",
+      "examples": {
+        "direct": "snapshot = mcp.scan_project()"
+      }
+    },
+    {
+      "id": "delete_file",
+      "method": "delete_file",
+      "args": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Chemin relatif du fichier à supprimer."
+        }
+      ],
+      "returns": "string",
+      "description": "Supprime le fichier et retourne un message de succès.",
+      "examples": {
+        "direct": "mcp.delete_file(\"tmp.txt\")"
+      }
+    },
+    {
+      "id": "handle_request",
+      "method": "handle_request",
+      "args": [
+        {
+          "name": "request_json",
+          "type": "string",
+          "required": true,
+          "description": "JSON stringifié suivant le schéma {\"action\": \"...\", \"args\": {...}}."
+        }
+      ],
+      "returns": "depends",
+      "description": "Adapter JSON : exécute une action basée sur le JSON fourni. Utile pour appeler le MCP depuis un tool qui ne supporte qu'un argument string.",
+      "examples": {
+        "direct": "req = json.dumps({\"action\":\"write_file\",\"args\":{\"path\":\"src/main.py\",\"content\":\"print('hi')\"}})\nmcp.handle_request(req)"
+      }
+    }
+  ],
+  "usage_via_tool": {
+    "note": "Le wrapper MCPTool attend un input JSON (string) avec la même structure.",
+    "example_input_string": "{\"action\":\"create_structure\",\"args\":{\"structure\": {\"src/app.py\": \"print(1)\", \"README.md\": \"# App\"}}}",
+    "tool_wrapper": "MCPTool (attend une string JSON) : standardise l'interface pour les agents."
+  },
+  "constraints_and_best_practices": [
+    "Tous les chemins doivent être relatifs (pas de chemins absolus).",
+    "Les tentatives de directory traversal lèveront une erreur (ValueError).",
+    "Toujours vérifier le type de retour ; certaines méthodes renvoient des chaînes, d'autres des objets JSON encodés (string) — utilisez json.loads si nécessaire.",
+    "Pour les appels automatisés depuis un agent, préférez le format JSON via handle_request ou via le MCPTool pour standardiser l'interface."
+  ],
+  "examples_pratiques": [
+    {
+      "purpose": "Écrire un fichier depuis un agent (via MCPTool input string)",
+      "input": "{\"action\":\"write_file\",\"args\":{\"path\":\"src/main.py\",\"content\":\"print(\\\"hello\\\")\"}}"
+    },
+    {
+      "purpose": "Lister les fichiers d'un dossier",
+      "input": "{\"action\":\"list_files\",\"args\":{\"path\":\"src\"}}"
+    },
+    {
+      "purpose": "Créer une structure complète",
+      "input": "{\"action\":\"create_structure\",\"args\":{\"structure\":{\"src/main.py\":\"print(\\\"run\\\")\",\"README.md\":\"# Project\"}}}"
+    }
+  ],
+  "return_expected_for_agents": {
+    "modifying_actions": "message texte confirmant l'opération (ex: \"File 'src/main.py' written successfully.\")",
+    "reading_actions": "contenu texte ou JSON encodé",
+    "errors": "exception ou message d'erreur (vérifier la valeur et, si nécessaire, logger/retourner l'erreur)"
+  }
+}

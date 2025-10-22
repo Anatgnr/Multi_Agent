@@ -28,9 +28,43 @@ class FilesSystemMCP:
         
     def write_file(self, path, content):
         abs_path = self._safe_path(path)
-        with open(abs_path, 'w') as file:
+        # Ensure content is a string before writing. Try JSON serialization first for rich objects.
+        if not isinstance(content, str):
+            try:
+                content = json.dumps(content, indent=2, default=str)
+            except Exception:
+                content = str(content)
+
+        with open(abs_path, 'w', encoding='utf-8') as file:
             file.write(content)
         return f"File '{path}' written successfully."
+    
+    def edit_file(self, path, find_text, replace_text):
+        abs_path = self._safe_path(path)
+        with open(abs_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        new_content = content.replace(find_text, replace_text)
+
+        with open(abs_path, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+        return f"Text replaced successfully in {path}"
+    
+    def scan_project(self):
+        result = {}
+        for root, dirs, files in os.walk(self.base_path):
+            for file in files:
+                rel_path = os.path.relpath(os.path.join(root, file), self.base_path)
+                result[rel_path] = self.read_file(rel_path)
+        return result
+    
+    def delete_file(self, path):
+        abs_path = self._safe_path(path)
+        os.remove(abs_path)
+        return f"File '{path}' deleted."
+
+
+
     
     def handle_request(self, request_json):
         # Execute a request in JSON format

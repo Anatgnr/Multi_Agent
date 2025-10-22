@@ -1,29 +1,68 @@
 import requests
+import json
+
+import requests, json
 
 class OllamaLLM:
-    def __init__(self, model_name):
-        self.model_name = model_name
-        self.api_url = "http://localhost:11434/api/generate"
-        
-    def __call__(self, input_text, **kwds):
-        # Transform user input in prompt text
-        if isinstance(input_text, list):
-            prompt = "\n".join(
-                [m["content"] if isinstance(m, dict) and "content" in m else str(m)
-                 for m in input_text]
-            )
+    """
+    Provider compatible CrewAI / creAI pour Ollama.
+    Permet de passer un modèle global ou un modèle spécifique par appel.
+    Renvoie toujours un dict {"output": str}.
+    """
+
+    def __init__(self, default_model="llama3.2", base_url="http://127.0.0.1:11434"):
+        self.default_model = default_model
+        self.base_url = base_url
+
+    def call(self, messages, model=None, **kwargs):
+        """
+        Appelle Ollama pour générer un texte.
+        - messages: str ou list de dicts [{"role":..., "content":...}]
+        - model: nom du modèle à utiliser pour cet appel (optionnel)
+        Retourne {"output": str}
+        """
+        # Concatène le prompt si messages est une liste
+        if isinstance(messages, list):
+            prompt = "\n".join([m.get("content", str(m)) if isinstance(m, dict) else str(m) for m in messages])
         else:
-            prompt = str(input_text)
-            
+            prompt = str(messages)
+
+        model_to_use = model or self.default_model
+
         payload = {
-            "model": self.model_name,
-            "prompt": prompt,
-            "stream": False
+            "model": model_to_use,
+            "prompt": prompt
         }
-        
-        response = requests.post(self.api_url, json=payload)
-        if response.status_code != 200:
-            raise RuntimeError(f"OLLAMA API ERROR {response.status_code}: {response.text}")
-        
-        data = response.json()
-        return {"output" : data.get("response", "")}
+
+        response = requests.post(f"{self.base_url}/api/generate", json=payload, stream=False)
+
+        if not response.ok:
+            raise Exception(f"Ollama error: {response.text}")
+
+        # Lit la réponse et concatène
+        output = ""
+        try:
+            for line in response.text.splitlines():
+                if not line.strip():
+                    continue
+                data = json.loads(line)
+                output += data.get("response", "")
+                if data.get("done"):
+                    break
+        except Exception as e:
+            raise Exception(f"Erreur parsing Ollama response: {e}\n{response.text}")
+
+        return {"output": output}
+
+
+# Wrapper pour un agent spécifique avec modèle dédié
+class OllamaAgentLLM:
+    """
+    Permet de passer un modèle spécifique à chaque agent.
+    """
+    def __init__(self, provider: OllamaLLM, model_name=None):
+        self.provider = provider
+        self.model_name = model_name
+
+    def call(self, messages, **kwargs):
+        return self.provider.call(messages, model=self.model_name, **kwargs)

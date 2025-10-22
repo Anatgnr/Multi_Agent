@@ -1,6 +1,6 @@
 # Config/tasks.yaml
 
-architecture:
+Architect:
   description: >
     Define the complete project structure for the requested application: {prompt}.
     Propose the necessary files and folders for the application.
@@ -11,7 +11,7 @@ architecture:
   agent: Architect
   output_file: project_structure.json
 
-backend:
+Backend:
   description: >
     Implement the backend logic of the project according to the defined structure.
     The code should capture and normalize keyboard and mouse events, optionally
@@ -21,7 +21,7 @@ backend:
   agent: Backend
   output_file: src/backend.py
 
-app:
+WindowsAppMaker:
   description: >
     Create a Windows graphical interface that displays detected events in real time.
     Use Tkinter or PyQt depending on availability. The UI should live in `src/app.py`.
@@ -30,7 +30,7 @@ app:
   agent: WindowsAppMaker
   output_file: src/app.py
 
-doc:
+DocWriter:
   description: >
     Write the documentation for the generated project. Include a `README.md` with:
     goals, structure, installation instructions, usage and contribution guidelines.
@@ -39,7 +39,7 @@ doc:
   agent: DocWriter
   output_file: README.md
 
-dep:
+DependencyManager:
   description: >
     Generate a `requirements.txt` file listing the Python dependencies needed
     (include versions if appropriate) and add notes for installation.
@@ -48,7 +48,7 @@ dep:
   agent: DependencyManager
   output_file: requirements.txt
 
-docker:
+Docker:
   description: >
     (Optional) Prepare the files necessary to package the application into a
     container or to build a Windows executable (e.g., Dockerfile, packaging scripts).

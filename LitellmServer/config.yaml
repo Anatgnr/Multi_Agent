@@ -1,0 +1,20 @@
+model_list:
+  - model_name: "llama3.2"
+    litellm_params:
+      model: "ollama/llama3.2"
+      api_base: "http://localhost:11434"
+  - model_name: "codellama"
+    litellm_params:
+      model: "ollama/codellama"
+      api_base: "http://localhost:11434"
+  - model_name: "mistral"
+    litellm_params:
+      model: "ollama/mistral"
+      api_base: "http://localhost:11434"
+  - model_name: "phi4"
+    litellm_params:
+      model: "ollama/phi4"
+      api_base: "http://localhost:11434"
+
+### Launch the server
+# litellm --config config.yaml --detailed_debug

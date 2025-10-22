@@ -12,3 +12,5 @@ windowsappmaker:
   model: mistral:latest
 docwriter:
   model: phi4:14b
+
+# Look if the file is important or need to be deleted
