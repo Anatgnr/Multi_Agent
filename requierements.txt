@@ -1,0 +1,9 @@
+# Python 3.12
+# conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+# conda install numpy scipy -c conda-forge
+# Without MKL included
+
+
+transformers accelerate
+yaml
+typing

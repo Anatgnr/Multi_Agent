@@ -1,0 +1,12 @@
+##### For local llm use the following configuration:
+
+model_type: huggingface
+model_name: mistralai/mistral-7b-instruct-v0.2
+use_8bit: False
+torch_dtype: float16
+device_map: cuda
+cache_dir: D:\code\Multi_Agent\cache
+do_sample: False
+temperature: 0.3
+top_p: 0.9
+

@@ -1,0 +1,36 @@
+# Config/agents.yaml
+Architect:
+  role: "Software Architect"
+  goal: "Design the application's structure and choose appropriate technologies."
+  task_template: "Analyze the following requirement and define the necessary modules: {prompt}"
+  enabled: true
+
+Backend:
+  role: "Backend Developer"
+  goal: "Implement the logic that captures keyboard and mouse events in Python."
+  task_template: "Develop Python code to read mouse clicks and keyboard presses and store these events."
+  enabled: true
+
+WindowsAppMaker:
+  role: "Windows Developer"
+  goal: "Create the graphical user interface and package the software as an executable."
+  task_template: "Develop a Windows application with a GUI that displays events in real time. Use Tkinter or PyQt."
+  enabled: true
+
+DocWriter:
+  role: "Technical Writer"
+  goal: "Write the README for the generated project."
+  task_template: "Write a clear, structured README explaining the generated project's purpose and how to use it."
+  enabled: true
+
+DependencyManager:
+  role: "Dependency Manager"
+  goal: "List the Python libraries required for the project to run correctly."
+  task_template: "Generate a requirements.txt file containing the dependencies required to run the project."
+  enabled: true
+
+Docker:
+  role: "Packaging/Containerization"
+  goal: "Prepare Dockerfile or packaging scripts to containerize or build an executable of the app."
+  task_template: "Create a Dockerfile and necessary packaging scripts to containerize or package the application for Windows."
+  enabled: false

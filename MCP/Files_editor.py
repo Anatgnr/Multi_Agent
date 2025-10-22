@@ -46,3 +46,26 @@ class FilesSystemMCP:
             return self.write_file(**args)
         else:
             return json.dumps({"error": "Unknown action"})
+        
+    def create_file(self, relative_path, content=""):
+        """
+        Crée un fichier avec le contenu donné.
+        """
+        file_path = os.path.join(self.base_path, relative_path)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(content)
+        print(f"✅ Fichier créé : {file_path}")
+        
+    def create_structure(self, structure: dict):
+        """
+        Crée une arborescence à partir d’un dictionnaire du type :
+        {
+            "src/main.py": "",
+            "src/app.py": "",
+            "requirements.txt": "",
+            "README.md": "# Mon App"
+        }
+        """
+        for path, content in structure.items():
+            self.create_file(path, content)
