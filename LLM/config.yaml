@@ -1,12 +1,14 @@
-##### For local llm use the following configuration:
+#### For OLLAMA server use the following configuration:
 
-model_type: huggingface
-model_name: mistralai/mistral-7b-instruct-v0.2
-use_8bit: False
-torch_dtype: float16
-device_map: cuda
-cache_dir: D:\code\Multi_Agent\cache
-do_sample: False
-temperature: 0.3
-top_p: 0.9
+# CAUTION: Make sure to have OLLAMA server running and the models downloaded locally.
+    # You can download models using the command: ollama pull <model_name>
+    # Feel free to change the model if you have a different preferences.
 
+architect:
+  model: llama3.2:latest
+backend:
+  model: codellama:7b
+windowsappmaker:
+  model: mistral:latest
+docwriter:
+  model: phi4:14b
